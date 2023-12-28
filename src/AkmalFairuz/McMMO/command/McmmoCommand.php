@@ -18,17 +18,19 @@ namespace AkmalFairuz\McMMO\command;
 
 use AkmalFairuz\McMMO\form\McmmoForm;
 use AkmalFairuz\McMMO\Main;
+use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
-use pocketmine\command\PluginCommand;
-use pocketmine\Player;
+use pocketmine\lang\Translatable;
+use pocketmine\player\Player;
 use pocketmine\plugin\Plugin;
 
-class McmmoCommand extends PluginCommand
+class McmmoCommand extends Command
 {
 
-    public function __construct(string $name, Plugin $owner)
+    public function __construct(Main $plugin)
     {
-        parent::__construct($name, $owner);
+        parent::__construct("mcmmo", "See the top players McMMO on this server at /mccmo", "Usage: /mccmo", []);
+        $this->setPermission("mcmmo.cmd");
     }
 
     public function execute(CommandSender $sender, string $commandLabel, array $args)
@@ -38,7 +40,7 @@ class McmmoCommand extends PluginCommand
             return true;
         }
         $form = new McmmoForm(Main::getInstance());
-        $form->init($sender);
+        $form->leaderboard($sender);
         return true;
     }
 

@@ -19,7 +19,13 @@ namespace AkmalFairuz\McMMO;
 use AkmalFairuz\McMMO\command\McmmoCommand;
 use AkmalFairuz\McMMO\command\McmmoSetupCommand;
 use AkmalFairuz\McMMO\entity\FloatingText;
+use pocketmine\block\Block;
+use pocketmine\block\DoubleTallGrass;
+use pocketmine\block\Flower;
+use pocketmine\block\Grass;
 use pocketmine\block\Solid;
+use pocketmine\block\TallGrass;
+use pocketmine\block\VanillaBlocks;
 use pocketmine\entity\Entity;
 use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\block\BlockPlaceEvent;
@@ -30,7 +36,9 @@ use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerItemConsumeEvent;
 use pocketmine\event\player\PlayerLoginEvent;
 use pocketmine\item\Item;
-use pocketmine\Player;
+use pocketmine\item\VanillaItems;
+use pocketmine\player\GameMode;
+use pocketmine\player\Player;
 use pocketmine\plugin\PluginBase;
 
 class Main extends PluginBase implements Listener
@@ -54,14 +62,14 @@ class Main extends PluginBase implements Listener
     /** @var Main */
     public static $instance;
 
-    public function onEnable()
+    public function onEnable() : void
     {
         $this->saveResource("database.yml");
-        $this->getServer()->getCommandMap()->register("mcmmo", new McmmoCommand("mcmmo", $this));
-        $this->getServer()->getCommandMap()->register("mcmmoadmin", new McmmoSetupCommand("mcmmoadmin", $this));
+        $this->getServer()->getCommandMap()->register("mcmmo", new McmmoCommand($this));
+//        $this->getServer()->getCommandMap()->register("mcmmoadmin", new McmmoSetupCommand("mcmmoadmin", $this));
         $this->database = yaml_parse(file_get_contents($this->getDataFolder() . "database.yml"));
         $this->getServer()->getPluginManager()->registerEvents($this, $this);
-        Entity::registerEntity(FloatingText::class, true);
+//        Entity::registerEntity(FloatingText::class, true);
         self::$instance = $this;
     }
 
@@ -69,7 +77,7 @@ class Main extends PluginBase implements Listener
         return self::$instance;
     }
 
-    public function onDisable()
+    public function onDisable() : void
     {
         file_put_contents($this->getDataFolder() . "database.yml", yaml_emit($this->database));
         sleep(3); // save database delay
@@ -90,13 +98,13 @@ class Main extends PluginBase implements Listener
             $this->addLevel($type, $player);
         }
         $a = ["Lumberjack", "Farmer", "Excavation", "Miner", "Killer", "Combat", "Builder", "Consumer", "Archer", "Lawn Mower"];
-        $player->sendTip("Your McMMO ".$a[$type]." xp is ".$this->getXp($type, $player));
+//        $player->sendTip("Your McMMO ".$a[$type]." xp is ".$this->getXp($type, $player));
     }
 
     public function addLevel(int $type, Player $player) {
         $this->database["level"][$type][strtolower($player->getName())]++;
         $a = ["Lumberjack", "Farmer", "Excavation", "Miner", "Killer", "Combat", "Builder", "Consumer", "Archer", "Lawn Mower"];
-        $player->sendMessage("Your McMMO ".$a[$type]." level is ".$this->getLevel($type, $player));
+//        $player->sendMessage("Your McMMO ".$a[$type]." level is ".$this->getLevel($type, $player));
     }
 
     public function getAll(int $type) : array {
@@ -122,48 +130,54 @@ class Main extends PluginBase implements Listener
         }
         $player = $event->getPlayer();
         $block = $event->getBlock();
-        switch($block->getId()) {
-            case Item::WHEAT_BLOCK:
-            case Item::BEETROOT_BLOCK:
-            case Item::PUMPKIN_STEM:
-            case Item::PUMPKIN:
-            case Item::MELON_STEM:
-            case Item::MELON_BLOCK:
-            case Item::CARROT_BLOCK:
-            case Item::POTATO_BLOCK:
-            case Item::SUGARCANE_BLOCK:
+
+        if ($player->getGamemode() === GameMode::CREATIVE()) {
+            return false;
+        }
+
+        switch($block->getTypeId()) {
+            case VanillaBlocks::WHEAT()->getTypeId():
+            case VanillaBlocks::BEETROOTS()->getTypeId():
+            case VanillaBlocks::PUMPKIN_STEM()->getTypeId():
+            case VanillaBlocks::PUMPKIN()->getTypeId():
+            case VanillaBlocks::MELON_STEM()->getTypeId():
+            case VanillaBlocks::MELON()->getTypeId():
+            case VanillaBlocks::CARROTS()->getTypeId():
+            case VanillaBlocks::POTATOES()->getTypeId():
+            case VanillaBlocks::SUGARCANE()->getTypeId():
                 $this->addXp(self::FARMER, $player);
                 return;
-            case Item::STONE:
-            case Item::DIAMOND_ORE:
-            case Item::GOLD_ORE:
-            case Item::REDSTONE_ORE:
-            case Item::IRON_ORE:
-            case Item::COAL_ORE:
-            case Item::EMERALD_ORE:
-            case Item::OBSIDIAN:
+            case VanillaBlocks::STONE()->getTypeId():
+            case VanillaBlocks::DIAMOND_ORE()->getTypeId():
+            case VanillaBlocks::GOLD_ORE()->getTypeId():
+            case VanillaBlocks::REDSTONE_ORE()->getTypeId():
+            case VanillaBlocks::IRON_ORE()->getTypeId():
+            case VanillaBlocks::COAL_ORE()->getTypeId():
+            case VanillaBlocks::EMERALD_ORE()->getTypeId():
+            case VanillaBlocks::OBSIDIAN()->getTypeId():
                 $this->addXp(self::MINER, $player);
                 return;
-            case Item::LOG:
-            case Item::LOG2:
-            case Item::LEAVES:
-            case Item::LEAVES2:
+            case VanillaBlocks::OAK_LOG()->getTypeId():
+            case VanillaBlocks::ACACIA_LOG()->getTypeId():
+            case VanillaBlocks::BIRCH_LOG()->getTypeId():
+            case VanillaBlocks::CHERRY_LOG()->getTypeId():
+            case VanillaBlocks::JUNGLE_LOG()->getTypeId():
+            case VanillaBlocks::DARK_OAK_LOG()->getTypeId():
+            case VanillaBlocks::MANGROVE_LOG()->getTypeId():
+            case VanillaBlocks::SPRUCE_LOG()->getTypeId():
                 $this->addXp(self::LUMBERJACK, $player);
                 return;
-            case Item::DIRT:
-            case Item::GRASS:
-            case Item::GRASS_PATH:
-            case Item::FARMLAND:
-            case Item::SAND:
-            case Item::GRAVEL:
+            case VanillaBlocks::DIRT()->getTypeId():
+            case VanillaBlocks::GRASS()->getTypeId():
+            case VanillaBlocks::GRASS_PATH()->getTypeId():
+            case VanillaBlocks::FARMLAND()->getTypeId():
+            case VanillaBlocks::SAND()->getTypeId():
+            case VanillaBlocks::GRAVEL()->getTypeId():
                 $this->addXp(self::EXCAVATION, $player);
                 return;
-            case Item::TALL_GRASS:
-            case Item::YELLOW_FLOWER:
-            case Item::RED_FLOWER:
-            case Item::CHORUS_FLOWER:
-                $this->addXp(self::LAWN_MOWER, $player);
-                return;
+        }
+        if ($block instanceof Flower || $block instanceof TallGrass || $block instanceof DoubleTallGrass) {
+            $this->addXp(self::LAWN_MOWER, $player);
         }
     }
 
@@ -175,8 +189,13 @@ class Main extends PluginBase implements Listener
             return;
         }
         $player = $event->getPlayer();
-        $block = $event->getBlock();
-        if($block instanceof Solid) {
+        $block = $event->getBlockAgainst();
+
+        if ($player->getGamemode() === GameMode::CREATIVE()) {
+            return false;
+        }
+
+        if($block instanceof Block) {
             $this->addXp(self::BUILDER, $player);
             return;
         }
@@ -186,18 +205,19 @@ class Main extends PluginBase implements Listener
      * @priority LOWEST
      */
     public function onDamage(EntityDamageEvent $event) {
-        if($event->isCancelled()) {
-            return;
-        }
         if($event->getEntity() instanceof FloatingText) {
-            $event->setCancelled();
+            $event->cancel();
             return;
         }
+
         if($event instanceof EntityDamageByEntityEvent) {
             $entity = $event->getEntity();
             if(!$entity instanceof Player) return;
             $damager = $event->getDamager();
             if($damager instanceof Player) {
+                if ($damager->getGamemode() === GameMode::CREATIVE()) {
+                    return false;
+                }
                 if (($entity->getHealth() - $event->getFinalDamage()) <= 0) {
                     $this->addXp(self::KILLER, $damager);
                 }
@@ -215,6 +235,9 @@ class Main extends PluginBase implements Listener
         }
         $entity = $event->getEntity();
         if($entity instanceof Player) {
+            if ($entity->getGamemode() === GameMode::CREATIVE()) {
+                return false;
+            }
             $this->addXp(self::ARCHER, $entity);
         }
     }
@@ -223,7 +246,10 @@ class Main extends PluginBase implements Listener
      * @priority LOWEST
      */
     public function onItemConsume(PlayerItemConsumeEvent $event) {
-        if($event->getPlayer()->getFood() < $event->getPlayer()->getMaxFood()) {
+        if($event->getPlayer()->getHungerManager()->getFood() < $event->getPlayer()->getHungerManager()->getMaxFood()) {
+            if ($event->getPlayer()->getGamemode() === GameMode::CREATIVE()) {
+                return false;
+            }
             $this->addXp(self::CONSUMER, $event->getPlayer());
         }
     }

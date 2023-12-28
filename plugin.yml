@@ -1,5 +1,11 @@
 name: McMMO
-api: 3.0.0
+api: 5.0.0
 main: AkmalFairuz\McMMO\Main
 version: 1.0.0
 author: AkmalFairuz
+
+permissions:
+  mcmmo.cmd:
+    default: true
+  mcmmoadmin.cmd:
+    default: op

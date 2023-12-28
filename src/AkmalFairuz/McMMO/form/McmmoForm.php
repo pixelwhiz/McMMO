@@ -16,9 +16,10 @@
 
 namespace AkmalFairuz\McMMO\form;
 
-use AkmalFairuz\McMMO\formapi\FormAPI;
+use jojoe77777\FormAPI\FormAPI;
 use AkmalFairuz\McMMO\Main;
-use pocketmine\Player;
+use jojoe77777\FormAPI\SimpleForm;
+use pocketmine\player\Player;
 
 class McmmoForm
 {
@@ -31,7 +32,7 @@ class McmmoForm
     }
 
     public function init(Player $player) {
-        $form = (new FormAPI())->createSimpleForm(function (Player $player, $data) {
+        $form = new SimpleForm(function (Player $player, $data) {
             if($data === null) {
                 return;
             }
@@ -51,43 +52,56 @@ class McmmoForm
     }
 
     public function stats(Player $player) {
-        $form = (new FormAPI())->createSimpleForm(function (Player $player, $data) {
+        $form = new SimpleForm(function (Player $player, $data) {
             if($data !== null) {
-                $this->init($player);
+                $this->leaderboard($player);
             }
         });
-        $form->setTitle("Your stats");
+        $form->setTitle("§l§aMCMMO STATS");
         $content = [
-            "Lumberjack: ",
-            "   XP: ".$this->plugin->getXp(Main::LUMBERJACK, $player),
-            "   Level: ".$this->plugin->getLevel(Main::LUMBERJACK, $player),
-            "Farmer: ",
-            "   XP: ".$this->plugin->getXp(Main::FARMER, $player),
-            "   Level: ".$this->plugin->getLevel(Main::FARMER, $player),
-            "Excavation: ",
-            "   XP: ".$this->plugin->getXp(Main::EXCAVATION, $player),
-            "   Level: ".$this->plugin->getLevel(Main::EXCAVATION, $player),
-            "Miner: ",
-            "   XP: ".$this->plugin->getXp(Main::MINER, $player),
-            "   Level: ".$this->plugin->getLevel(Main::MINER, $player),
-            "Killer: ",
-            "   XP: ".$this->plugin->getXp(Main::KILLER, $player),
-            "   Level: ".$this->plugin->getLevel(Main::KILLER, $player),
-            "Combat: ",
-            "   XP: ".$this->plugin->getXp(Main::COMBAT, $player),
-            "   Level: ".$this->plugin->getLevel(Main::COMBAT, $player),
-            "Builder: ",
-            "   XP: ".$this->plugin->getXp(Main::BUILDER, $player),
-            "   Level: ".$this->plugin->getLevel(Main::BUILDER, $player),
-            "Consumer: ",
-            "   XP: ".$this->plugin->getXp(Main::CONSUMER, $player),
-            "   Level: ".$this->plugin->getLevel(Main::CONSUMER, $player),
-            "Archer: ",
-            "   XP: ".$this->plugin->getXp(Main::ARCHER, $player),
-            "   Level: ".$this->plugin->getLevel(Main::ARCHER, $player),
-            "Lawn Mower: ",
-            "   XP: ".$this->plugin->getXp(Main::LAWN_MOWER, $player),
-            "   Level: ".$this->plugin->getLevel(Main::LAWN_MOWER, $player)
+            "§6> §7MCMMO Stats Of §b{$player->getName()} §6<",
+            "",
+            "§f----------",
+            "§6Lumberjack: ",
+            "§7XP: §a".$this->plugin->getXp(Main::LUMBERJACK, $player),
+            "§7Level: §e".$this->plugin->getLevel(Main::LUMBERJACK, $player),
+            "§f----------",
+            "§6Farming: ",
+            "§7XP: §a".$this->plugin->getXp(Main::FARMER, $player),
+            "§7Level: §e".$this->plugin->getLevel(Main::FARMER, $player),
+            "§f----------",
+            "§6Excavation: ",
+            "§7XP: §a".$this->plugin->getXp(Main::EXCAVATION, $player),
+            "§7Level: §e".$this->plugin->getLevel(Main::EXCAVATION, $player),
+            "§f----------",
+            "§6Mining: ",
+            "§7XP: §a".$this->plugin->getXp(Main::MINER, $player),
+            "§7Level: §e".$this->plugin->getLevel(Main::MINER, $player),
+            "§f----------",
+            "§6Kills: ",
+            "§7XP: §a".$this->plugin->getXp(Main::KILLER, $player),
+            "§7Level: §e".$this->plugin->getLevel(Main::KILLER, $player),
+            "§f----------",
+            "§6Combat: ",
+            "§7XP: §a".$this->plugin->getXp(Main::COMBAT, $player),
+            "§7Level: §e".$this->plugin->getLevel(Main::COMBAT, $player),
+            "§f----------",
+            "§6Building: ",
+            "§7XP: §a".$this->plugin->getXp(Main::BUILDER, $player),
+            "§7Level: §e".$this->plugin->getLevel(Main::BUILDER, $player),
+            "§f----------",
+            "§6Consuming: ",
+            "§7XP: §a".$this->plugin->getXp(Main::CONSUMER, $player),
+            "§7Level: §e".$this->plugin->getLevel(Main::CONSUMER, $player),
+            "§f----------",
+            "§6Archering: ",
+            "§7XP: §a".$this->plugin->getXp(Main::ARCHER, $player),
+            "§7Level: §e".$this->plugin->getLevel(Main::ARCHER, $player),
+            "§f----------",
+            "§6Lawn Mowing: ",
+            "§7XP: §a".$this->plugin->getXp(Main::LAWN_MOWER, $player),
+            "§7Level: §e".$this->plugin->getLevel(Main::LAWN_MOWER, $player),
+            "§f----------"
         ];
         $form->setContent(implode("\n", $content));
         $form->addButton("Back");
@@ -95,45 +109,51 @@ class McmmoForm
     }
 
     public function leaderboard(Player $player) {
-        $a = ["Lumberjack", "Farmer", "Excavation", "Miner", "Killer", "Combat", "Builder", "Consumer", "Archer", "Lawn Mower"];
-        $form = (new FormAPI())->createSimpleForm(function (Player $player, $data) use ($a) {
+        $a = ["Lumberjack", "Farming", "Excavation", "Mining", "Kills", "Combat", "Building", "Consuming", "Archering", "Lawn Mowing"];
+        $form = new SimpleForm(function (Player $player, $data) use ($a) {
             if($data === null) {
                 return;
             }
-            if($data === count($a)) {
-                $this->init($player);
-                return;
+            if ($data === 0) {
+                $this->stats($player);
+                return false;
             }
-            $this->leaderboards($player, $data);
+
+            if ($data !== 0) {
+                $this->leaderboards($player, $data - 1);
+                return false;
+            }
         });
-        $form->setTitle("Leaderboard");
-        $form->setContent("");
+        $form->setTitle("§l§6MCMMO");
+        $form->addButton("§lMMO STATS");
         foreach($a as $as) {
-            $form->addButton($as);
+            $text = "§lTOP ".strtoupper($as);
+            $form->addButton($text);
         }
-        $form->addButton("Back");
         $form->sendToPlayer($player);
     }
 
+
     public function leaderboards(Player $player, int $type) {
-        $form = (new FormAPI())->createSimpleForm(function (Player $player, $data) {
+        $form = new SimpleForm(function (Player $player, $data) {
             if($data !== null) {
                 $this->leaderboard($player);
             }
         });
         $a = ["Lumberjack", "Farmer", "Excavation", "Miner", "Killer", "Combat", "Builder", "Consumer", "Archer", "Lawn Mower"];
-        $form->setTitle("Leaderboard ".$a[$type]);
+        $and = ["Lumberjack", "Farming", "Excavation", "Mining", "Kills", "Combat", "Building", "Consuming", "Archering", "Lawn Mowing"];
+        $form->setTitle("§l§aTOP ".strtoupper($and[$type]));
         $content = "";
         $a = $this->plugin->getAll($type);
         arsort($a);
         $i = 1;
         foreach($a as $key => $as) {
             if($i == 20) break;
-            $content .= $i.") ".$key . " : ".$as."\n";
+            $content .= "§f[".$i."] - §b".$key . " §alevel §e".$as."\n";
             $i++;
         }
-        $form->setContent("Player Name | Level\n\n".$content);
-        $form->addButton("Back");
+        $form->setContent($content."\n");
+        $form->addButton("§l§cBACK");
         $form->sendToPlayer($player);
     }
 }
